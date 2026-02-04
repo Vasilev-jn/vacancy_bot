@@ -1,40 +1,41 @@
 ﻿# Vacancy Bot
 
-Telegram bot that helps users find vacancies on HH.ru, save a profile, and browse cards with full vacancy text.
+Телеграм‑бот для поиска вакансий на HH.ru: хранит профиль пользователя и показывает вакансии карточками с полным текстом.
 
-## Features
-- Profile onboarding (/start) with role, work format, locations, salary, experience, skills.
-- Vacancy cards with full text, work format, experience, salary, and skill match counters.
-- Main menu with quick actions: Resume and Vacancies.
-- Postgres storage for user profiles.
+## Возможности
+- Онбординг профиля (/start): должность, формат, локации, зарплата, опыт, навыки.
+- Карточки вакансий с полным текстом, форматом работы, опытом, зарплатой.
+- Подсчёт совпадений навыков в тексте вакансии.
+- Главное меню: «Резюме» и «Вакансии».
+- Хранение профиля в PostgreSQL (опционально, но рекомендуется).
 
-## Requirements
+## Требования
 - Python 3.10+
-- PostgreSQL (optional, but recommended for persistent profiles)
+- PostgreSQL (опционально, для сохранения профиля между перезапусками)
 
-## Setup
-1) Create a virtual environment (optional):
+## Установка
+1) Создай виртуальное окружение (по желанию):
 
 ```bash
 python -m venv .venv
 .\.venv\Scripts\activate
 ```
 
-2) Install dependencies:
+2) Установи зависимости:
 
 ```bash
 pip install pytelegrambotapi python-dotenv requests psycopg2-binary
 ```
 
-3) Configure environment:
+3) Настрой окружение:
 
-Copy `.env.example` to `.env` and fill values.
+Скопируй `.env.example` в `.env` и заполни значения.
 
 ```bash
 copy .env.example .env
 ```
 
-Example `.env`:
+Пример `.env`:
 
 ```
 BOT_TOKEN=YOUR_TELEGRAM_BOT_TOKEN
@@ -47,21 +48,21 @@ MATCH_THRESHOLD=0.5
 SKILLS_SAMPLE_RATIO=0.5
 ```
 
-4) Run the bot:
+4) Запусти бота:
 
 ```bash
 python main.py
 ```
 
-## Usage
-- `/start` — onboarding or show saved profile.
-- `📄 Резюме` — show profile.
-- `👀 Вакансии` — show vacancy cards.
+## Использование
+- `/start` — онбординг или показ сохранённого профиля.
+- `📄 Резюме` — показать профиль.
+- `👀 Вакансии` — показать карточки вакансий.
 
-## Notes
-- HH search is performed only by role. Skills are used for match counters in cards.
-- Vacancy details are fetched on demand to show full text and compute skill matches.
-- `.env` is ignored by git. Use `.env.example` as a template.
+## Примечания
+- Поиск в HH выполняется только по должности. Навыки используются для подсчёта совпадений в карточке.
+- Полный текст вакансии запрашивается при показе карточки.
+- `.env` не хранится в git. Используй `.env.example` как шаблон.
 
-## License
-MIT License. See `LICENSE`.
+## Лицензия
+MIT. См. `LICENSE`.
