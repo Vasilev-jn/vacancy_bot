@@ -1,0 +1,1 @@
+"""Vacancy bot application package."""
