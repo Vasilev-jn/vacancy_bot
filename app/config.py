@@ -29,17 +29,10 @@ def _env_float(name: str, default: float) -> float:
 @dataclass(frozen=True)
 class Settings:
     bot_token: str | None
+    telegram_proxy_url: str | None
     pg_dsn: str | None
     hh_base_url: str
-    hh_token: str | None
     hh_user_agent: str
-    fl_rss_url: str
-    fl_user_agent: str
-    freelance_ru_search_url: str
-    freelance_ru_user_agent: str
-    freelance_ru_open_for_all_only: bool
-    enable_fl_source: bool
-    enable_freelance_ru_source: bool
     request_timeout: int
     max_query_skills: int
     vacancy_cache_size: int
@@ -65,17 +58,10 @@ def get_settings() -> Settings:
     vacancy_cache_size = _env_int("VACANCY_CACHE_SIZE", 15)
     return Settings(
         bot_token=os.getenv("BOT_TOKEN"),
+        telegram_proxy_url=os.getenv("TELEGRAM_PROXY_URL") or os.getenv("TG_PROXY_URL"),
         pg_dsn=os.getenv("PG_DSN"),
         hh_base_url=os.getenv("HH_BASE_URL", "https://api.hh.ru").rstrip("/"),
-        hh_token=os.getenv("HH_TOKEN"),
         hh_user_agent=os.getenv("HH_USER_AGENT", "VacancyBot/0.1"),
-        fl_rss_url=os.getenv("FL_RSS_URL", "https://www.fl.ru/rss/all.xml?category=5"),
-        fl_user_agent=os.getenv("FL_USER_AGENT", os.getenv("HH_USER_AGENT", "VacancyBot/0.1")),
-        freelance_ru_search_url=os.getenv("FREELANCE_RU_SEARCH_URL", "https://www.freelance.ru/project/search"),
-        freelance_ru_user_agent=os.getenv("FREELANCE_RU_USER_AGENT", os.getenv("HH_USER_AGENT", "VacancyBot/0.1")),
-        freelance_ru_open_for_all_only=_env_bool("FREELANCE_RU_OPEN_FOR_ALL_ONLY", True),
-        enable_fl_source=_env_bool("ENABLE_FL_SOURCE", True),
-        enable_freelance_ru_source=_env_bool("ENABLE_FREELANCE_RU_SOURCE", True),
         request_timeout=_env_int("REQUEST_TIMEOUT", 15),
         max_query_skills=5,
         vacancy_cache_size=vacancy_cache_size,

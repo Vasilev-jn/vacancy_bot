@@ -2,11 +2,11 @@ import random
 import time
 
 from app import state
-from app.clients.vacancy_sources import fetch_fl_with_info, fetch_freelance_ru_with_info, fetch_hh_details, normalize_hh
+from app.clients.vacancy_sources import fetch_hh_details, fetch_hh_with_info, normalize_hh
 from app.config import Settings
 from app.services.matching import compute_match_stats, filter_vacancies_by_profile
 from app.services.profile_store import get_profile_for_user
-from app.utils.text import clean_html, escape_text, format_published_at_display, format_salary, limit_text
+from app.utils.text import clean_html, escape_text, format_salary, limit_text
 
 
 def enrich_hh_vacancy(profile: dict, vacancy: dict, settings: Settings) -> dict:
@@ -46,15 +46,9 @@ def fetch_vacancies(profile: dict, settings: Settings, tg_id: int | None = None)
     all_vacancies = []
     source_infos = []
 
-    if settings.enable_fl_source:
-        items, info = fetch_fl_with_info(profile, settings, limit=settings.per_source_cache)
-        all_vacancies.extend(items)
-        source_infos.append(info)
-
-    if settings.enable_freelance_ru_source:
-        items, info = fetch_freelance_ru_with_info(profile, settings, limit=settings.per_source_cache)
-        all_vacancies.extend(items)
-        source_infos.append(info)
+    items, info = fetch_hh_with_info(profile, settings, limit=settings.per_source_cache)
+    all_vacancies.extend(items)
+    source_infos.append(info)
 
     filtered = filter_vacancies_by_profile(profile, all_vacancies, settings)
     if tg_id is not None:
@@ -108,34 +102,7 @@ def mark_vacancy_seen(tg_id: int, vacancy: dict, settings: Settings) -> None:
 
 
 def build_vacancy_text(vacancy: dict) -> str:
-    source = vacancy.get("source") or "source"
-    if source in {"fl", "freelance_ru"}:
-        title = escape_text(vacancy.get("title") or "Без названия")
-        category = escape_text(vacancy.get("category") or "не указана")
-        salary = format_salary(vacancy.get("salary_from"), vacancy.get("salary_to"), vacancy.get("currency"))
-        if salary == "не указана" and vacancy.get("price_text"):
-            salary = escape_text(vacancy.get("price_text"))
-        published_at = escape_text(format_published_at_display(vacancy.get("published_at")))
-        description = limit_text(clean_html(vacancy.get("description") or ""))
-        source_name = escape_text(vacancy.get("source_name") or "FL.ru")
-        company = escape_text(vacancy.get("company_name") or "")
-        match_ratio = vacancy.get("match_ratio")
-        match_text = ""
-        if isinstance(match_ratio, (int, float)):
-            match_text = f"\nСовпадение по ключам: {int(round(match_ratio * 100))}%"
-        text = (
-            f"<b>{title}</b>\n"
-            f"Биржа: {source_name}\n"
-            f"Категория: {category}\n"
-            f"Бюджет: {salary}\n"
-            f"Создан/опубликован: {published_at}{match_text}"
-        )
-        if company:
-            text += f"\nЗаказчик: {company}"
-        if description:
-            text += f"\n\n{escape_text(description)}"
-        return text
-
+    source = escape_text(vacancy.get("source_name") or vacancy.get("source") or "HH.ru")
     title = escape_text(vacancy.get("title") or "Без названия")
     company = escape_text(vacancy.get("company_name") or "Компания не указана")
     location = escape_text(vacancy.get("location") or "Локация не указана")
@@ -173,25 +140,11 @@ def format_fetch_info(info: dict | None) -> str | None:
         total_items = info.get("items", 0)
         matched = info.get("matched")
         if sources and all(src.get("error") for src in sources):
-            names = ", ".join(src.get("source_name") or src.get("source") or "source" for src in sources)
-            return f"Источники сейчас недоступны ({names}). Попробуй позже."
+            return "HH сейчас не отвечает. Попробуй позже."
         if matched == 0 and total_items > 0:
-            return "Биржи вернули заказы, но по текущему фильтру ничего не подошло."
+            return "HH вернул вакансии, но по текущему фильтру ничего не подошло."
         if total_items == 0:
-            return "Биржи не вернули заказов по текущему запросу."
-        return None
-    if info.get("source") == "fl":
-        if info.get("error"):
-            return "FL.ru сейчас не отвечает или вернул некорректный RSS. Попробуй позже."
-        if info.get("items", 0) == 0:
-            return "FL.ru не вернул подходящих заказов по текущему фильтру."
-        return None
-    if info.get("source") == "freelance_ru":
-        if info.get("error"):
-            return "Freelance.ru сейчас не отвечает. Попробуй позже."
-        if info.get("items", 0) == 0:
-            query = info.get("query") or "текущий запрос"
-            return f"Freelance.ru не вернул заказов по запросу: {query}"
+            return "HH не вернул вакансий по текущему запросу."
         return None
     if info.get("error"):
         return "HH сейчас не отвечает. Попробуй позже."

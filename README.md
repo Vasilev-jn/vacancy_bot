@@ -1,19 +1,17 @@
 # vacancy_bot
 
-Telegram bot that collects a user profile, fetches relevant vacancies and freelance orders from external sources, ranks them by profile match, and stores the profile in PostgreSQL when persistence is enabled.
+Telegram bot that collects a user profile, fetches relevant vacancies from HH.ru, ranks them by profile match, and stores the profile in PostgreSQL when persistence is enabled.
 
 ## What the bot does
 
 - Onboards the user through Telegram chat and stores the desired role, work format, locations, budget, experience, skills, stop words, and blacklisted companies.
-- Fetches matching opportunities from external sources and shows them as Telegram cards with links and matching metadata.
+- Fetches matching HH.ru vacancies and shows them as Telegram cards with links and matching metadata.
 - Filters results by budget, stop words, company blacklist, and skill match ratio.
 - Supports automatic push delivery for new matching vacancies.
 
 ## External APIs and data sources
 
-- HH.ru API client for vacancy normalization and detail enrichment
-- FL.ru RSS feed
-- Freelance.ru search page parsing
+- HH.ru API client for vacancy search, normalization, and detail enrichment
 - Telegram Bot API via `pyTelegramBotAPI`
 
 ## Profile storage
@@ -63,11 +61,9 @@ python main.py
 ## Environment variables
 
 - `BOT_TOKEN` - Telegram bot token
+- `TELEGRAM_PROXY_URL` - optional HTTP/SOCKS proxy for Telegram API only, for example `socks5h://127.0.0.1:1080`
 - `PG_DSN` - PostgreSQL DSN for profile persistence
-- `HH_BASE_URL`, `HH_TOKEN`, `HH_USER_AGENT` - HH.ru client configuration
-- `FL_RSS_URL`, `FL_USER_AGENT` - FL.ru source configuration
-- `FREELANCE_RU_SEARCH_URL`, `FREELANCE_RU_USER_AGENT`, `FREELANCE_RU_OPEN_FOR_ALL_ONLY` - Freelance.ru source configuration
-- `ENABLE_FL_SOURCE`, `ENABLE_FREELANCE_RU_SOURCE` - source toggles
+- `HH_BASE_URL`, `HH_USER_AGENT` - HH.ru client configuration. HH vacancy requests use `User-Agent`; a token is not required.
 - `REQUEST_TIMEOUT`, `FETCH_ATTEMPTS` - HTTP behavior
 - `VACANCY_CACHE_SIZE`, `PER_SOURCE_CACHE`, `VACANCY_CACHE_TTL`, `MAX_SEEN_PER_USER` - caching behavior
 - `MATCH_THRESHOLD`, `SKILLS_SAMPLE_RATIO`, `HH_PAGE_RANGE` - search and matching behavior

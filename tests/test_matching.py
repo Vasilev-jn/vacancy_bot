@@ -5,17 +5,10 @@ from app.services.matching import filter_vacancies_by_profile, normalize_skills_
 def build_settings(**overrides) -> Settings:
     data = {
         "bot_token": "token",
+        "telegram_proxy_url": None,
         "pg_dsn": None,
         "hh_base_url": "https://api.hh.ru",
-        "hh_token": None,
         "hh_user_agent": "VacancyBot/0.1",
-        "fl_rss_url": "https://www.fl.ru/rss/all.xml?category=5",
-        "fl_user_agent": "VacancyBot/0.1",
-        "freelance_ru_search_url": "https://www.freelance.ru/project/search",
-        "freelance_ru_user_agent": "VacancyBot/0.1",
-        "freelance_ru_open_for_all_only": True,
-        "enable_fl_source": True,
-        "enable_freelance_ru_source": True,
         "request_timeout": 15,
         "max_query_skills": 5,
         "vacancy_cache_size": 15,

@@ -3,6 +3,7 @@ import threading
 import time
 
 import telebot
+from telebot import apihelper
 
 from app.config import Settings, get_settings
 from app.db import init_db
@@ -14,8 +15,20 @@ from app.services.vacancies import build_vacancy_text, fetch_vacancies, filter_n
 logger = logging.getLogger(__name__)
 
 
+def configure_telegram_proxy(settings: Settings) -> None:
+    if settings.telegram_proxy_url:
+        apihelper.proxy = {
+            "http": settings.telegram_proxy_url,
+            "https": settings.telegram_proxy_url,
+        }
+        logger.info("Telegram proxy enabled")
+    else:
+        apihelper.proxy = None
+
+
 def create_bot(settings: Settings) -> telebot.TeleBot:
     settings.validate()
+    configure_telegram_proxy(settings)
     return telebot.TeleBot(settings.bot_token, parse_mode="HTML")
 
 
